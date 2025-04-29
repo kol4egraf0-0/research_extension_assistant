@@ -17,7 +17,7 @@ public class GeminiResponse {
     //                        "text":
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private List<Candidate> candidateList;
+    private List<Candidate> candidates;
 
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -28,7 +28,7 @@ public class GeminiResponse {
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Content {
-        private List<Part> partList;
+        private List<Part> parts;
     }
 
     @Data

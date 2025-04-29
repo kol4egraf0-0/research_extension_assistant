@@ -49,7 +49,7 @@ public class ResearchService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
-
+        System.out.println("Raw API response: " + response);
         return extractTextFromResponse(response);
     }
 
@@ -57,14 +57,14 @@ public class ResearchService {
     private String extractTextFromResponse(String response) {
         try{
             GeminiResponse geminiResponse = objectMapper.readValue(response, GeminiResponse.class);
-            if(geminiResponse.getCandidateList() != null && !geminiResponse.getCandidateList().isEmpty()) {
-                GeminiResponse.Candidate firstCandidate = geminiResponse.getCandidateList().get(0);
-                if(firstCandidate.getContent() != null && firstCandidate.getContent().getPartList() !=null
-                        && !firstCandidate.getContent().getPartList().isEmpty()) {
-                    return firstCandidate.getContent().getPartList().get(0).getText();
+            if(geminiResponse.getCandidates() != null && !geminiResponse.getCandidates().isEmpty()) {
+                GeminiResponse.Candidate firstCandidate = geminiResponse.getCandidates().get(0);
+                if(firstCandidate.getContent() != null && firstCandidate.getContent().getParts() !=null
+                        && !firstCandidate.getContent().getParts().isEmpty()) {
+                    return firstCandidate.getContent().getParts().get(0).getText();
                 }
             }
-            return "Нет контента!!!";
+            return "Нет контента!!!" + response;
         } catch (Exception e){
             return "Ошибка парсинга: " + e.getMessage();
         }
@@ -76,7 +76,7 @@ public class ResearchService {
                 case "summarize": //итог, стирает и пишет нужную инфу в 3-4 предложения
                     prompt.append("Provide a clear and concise summary of the following in the few setnces:\n\n");
                     break;
-                case "Согласовать":
+                case "suggested":
                     prompt.append("Based on the following information: suggest related topics and further reading.Format the response with clear headings and bullet point\n\n");
                     break;
 
