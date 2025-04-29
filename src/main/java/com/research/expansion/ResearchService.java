@@ -1,5 +1,6 @@
 package com.research.expansion;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -10,15 +11,22 @@ import java.util.Map;
 
 @Service
 public class ResearchService {
+
+
     @Value("${gemini.api.url}")
     private String geminiApiUrl;
+
+
     @Value("${gemini.api.key}")
     private String geminiApiKey;
 
     private final WebClient webClient;
 
-    public ResearchService(WebClient.Builder webClient) {
+    private final ObjectMapper objectMapper;
+
+    public ResearchService(WebClient.Builder webClient, ObjectMapper objectMapper) {
         this.webClient = webClient.build();
+        this.objectMapper = objectMapper;
     }
 
     public String processContent(ResearchRequest request) {
@@ -42,7 +50,24 @@ public class ResearchService {
                 .bodyToMono(String.class)
                 .block();
 
-        
+        return extractTextFromResponse(response);
+    }
+
+    //парсинг
+    private String extractTextFromResponse(String response) {
+        try{
+            GeminiResponse geminiResponse = objectMapper.readValue(response, GeminiResponse.class);
+            if(geminiResponse.getCandidateList() != null && !geminiResponse.getCandidateList().isEmpty()) {
+                GeminiResponse.Candidate firstCandidate = geminiResponse.getCandidateList().get(0);
+                if(firstCandidate.getContent() != null && firstCandidate.getContent().getPartList() !=null
+                        && !firstCandidate.getContent().getPartList().isEmpty()) {
+                    return firstCandidate.getContent().getPartList().get(0).getText();
+                }
+            }
+            return "Нет контента!!!";
+        } catch (Exception e){
+            return "Ошибка парсинга: " + e.getMessage();
+        }
     }
 
     public String buildPrompt(ResearchRequest request) { //prompt
