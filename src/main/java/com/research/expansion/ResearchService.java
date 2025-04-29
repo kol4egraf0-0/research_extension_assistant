@@ -2,6 +2,7 @@ package com.research.expansion;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.HashMap;
@@ -9,9 +10,9 @@ import java.util.Map;
 
 @Service
 public class ResearchService {
-    @Value("${g1}")
+    @Value("${gemini.api.url}")
     private String geminiApiUrl;
-    @Value("${g2}")
+    @Value("${gemini.api.key}")
     private String geminiApiKey;
 
     private final WebClient webClient;
@@ -34,7 +35,14 @@ public class ResearchService {
                         })
                 }
         );
-        return request.getContent(); //заглушка
+        String response = webClient.post()
+                .uri(geminiApiUrl+geminiApiKey)
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        
     }
 
     public String buildPrompt(ResearchRequest request) { //prompt

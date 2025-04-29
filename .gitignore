@@ -33,5 +33,5 @@ build/
 .vscode/
 .idea
 
-### KEYS ###
-src/main/resources/application.properties
+
+
