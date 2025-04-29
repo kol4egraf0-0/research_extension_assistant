@@ -1,12 +1,25 @@
 package com.research.expansion;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class ResearchService {
+    @Value("${g1}")
+    private String geminiApiUrl;
+    @Value("${g2}")
+    private String geminiApiKey;
+
+    private final WebClient webClient;
+
+    public ResearchService(WebClient.Builder webClient) {
+        this.webClient = webClient.build();
+    }
+
     public String processContent(ResearchRequest request) {
         //промпт
         String prompt = buildPrompt(request);
