@@ -40,10 +40,14 @@ async function summarizeText(){
 
 async function saveNotes(){
     const notes = document.getElementById('notes').value;
-    //сохраняем в хром
-    chrome.storage.local.set({'researchNotes': notes}, function(){
-        alert('Notes saved successfully');
-    })
+    //сохраняем в буфер
+    try {
+        await navigator.clipboard.writeText(notes); 
+        alert('Заметки скопированы в буфер обмена!');
+    } catch (err) {
+        alert('Ошибка при копировании: ' + err.message);
+    }
+
 }
 
 function showResults(content){
