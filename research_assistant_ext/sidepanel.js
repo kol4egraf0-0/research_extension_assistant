@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('saveNotesBtn').addEventListener('click', saveNotes)
 })
 
+// Функция для суммирования выделенного текста
 async function summarizeText(){
     try {
         const [tab] = await chrome.tabs.query({active:true, currentWindow:true})
@@ -29,7 +30,6 @@ async function summarizeText(){
         if(!response.ok){
             throw new Error(`API ERROR: ${response.status}`);
         }
-
         const text = await response.text();
         showResults(text.replace(/\n/g,'<br>'));
 
@@ -40,6 +40,7 @@ async function summarizeText(){
 
 async function saveNotes(){
     const notes = document.getElementById('notes').value;
+    //сохраняем в хром
     chrome.storage.local.set({'researchNotes': notes}, function(){
         alert('Notes saved successfully');
     })
