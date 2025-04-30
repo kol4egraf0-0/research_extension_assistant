@@ -1,0 +1,39 @@
+document.addEventListener('DOMContentLoaded', ()=>{
+    chrome.storage.local.get(['researchNotes'], function(result){
+        if(result.researchNotes){
+            document.getElementById('notes').value = result.researchNotes
+        }
+    });
+    document.getElementById('summarizeBtn').addEventListener('click', summarizeText);
+    document.getElementById('saveNotesBtn').addEventListener('click', saveNotes)
+})
+
+async function summarizeText(){
+    try {
+        const [tab] = await chrome.tabs.query({active:true, currentWindow:true})
+        const [{result}] = await chrome.scripting.executeScript({
+            target:{tabId: tab.id},
+            function: () => window.getSelection().toString()
+        });
+        if(!result){
+            showResults("Please select text w mouse first");
+            return;
+        }
+
+        const response = await fetch("http://localhost:8080/api/research/process", { //вывод с запроса
+            method: 'POST',
+            headers: {'Content-type': 'application/json'},
+            body: JSON.stringify({content: result, operation:'summarize'})
+        })
+    } catch (error) {
+        
+    }
+}
+
+async function saveNotes(){
+
+}
+
+function showResults(content){
+
+}
